@@ -1,25 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <nav class="h-[10vh] ">
-        <ul>
-            <li></li>
-            <li></li>
+    <nav class="h-[10vh] bg-[#000]">
+        <ul class="flex justify-between ">
+            <li class="mt-[12px] mx-3 text-2xl text-white text-[30px]">Vibez</li>
+            <li class="mt-[8px]  mx-3 text-2xl"><button
+                    class="  p-[4px] text-[20px] w-[90px]     border-2  rounded-lg text-white hover:bg-white hover:text-black hover:border-gray-900 hover:border- transition: ease-in-out delay-100 ">GitHub</button>
+            </li>
         </ul>
     </nav>
-    <main class="h-[90vh] flex flex-row">
-        <div class="music-playlist h-[90vh] w-[50%] bg-black">
+    <main class="flex flex-row">
+        <div class="music-playlist h-[77vh] w-[50%] bg-[#151A1E] ">
+        <div class="choose-file flex justify-end">
+            <input type="file" accept="audio/mp3, audio/wav" class="file-chooser" style="display: none;">
+            <button class="w-8 10px mr-4 rounded mt-2 border" onclick="document.querySelector('.file-chooser').click()">
+                <img src="SVG/plus.svg">
+            </button>
+        </div>
 
         </div>
-        <div class="album-track h-[90vh] w-[50%] bg-green-900">
+        <div class="album-track h-[77vh] w-[50%] bg-[#2A2E32]">
 
         </div>
     </main>
+    <footer class="h-[13vh] bg-[#000] flex justify-center flex-col items-center">
+        <input type="range" class="w-[80%] max ">
+        <div class="controls flex justify-center space-x-2">
+            <img src="SVG/rewind.svg" class="h-10 mt-2 cursor-pointer ">
+            <img src="SVG/play.svg" class="h-10 mt-2 cursor-pointer ">
+            <img src="SVG/forward.svg" class="h-10 mt-2 cursor-pointer ">
+        </div>
+
+    </footer>
 </body>
+<script src="script.js"></script>
+
+
 </html>
