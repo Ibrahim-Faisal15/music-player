@@ -18,24 +18,25 @@
         </ul>
     </nav>
     <main class="flex flex-row">
-        <div class="music-playlist h-[77vh] w-[50%] bg-[#151A1E] ">
-        <div class="choose-file flex justify-end">
-            <input type="file" accept="audio/mp3" class="file_chooser" style="display: none;">
-            <button class="w-8 10px mr-4 rounded mt-2 border" onclick="document.querySelector('.file_chooser').click()">
-                <img src="SVG/plus.svg">
-            </button>
-        </div>
+        <div class="music_playlist h-[77vh] w-[100%] bg-[#151A1E] ">
+            <div class="choose_file flex justify-end">
+                <input type="file" accept="audio/mp3" class="file_chooser" style="display: none;">
+                <button class="w-8 10px mr-4 rounded mt-2 border"
+                    onclick="document.querySelector('.file_chooser').click()">
+                    <img src="SVG/plus.svg">
+                </button>
+            </div>
 
         </div>
-        <div class="album-track h-[77vh] w-[50%] bg-[#2A2E32]">
+        <!-- <div class="album-track h-[77vh] w-[50%] bg-[#2A2E32]">
 
-        </div>
+        </div> -->
     </main>
-    <footer class="h-[13vh] bg-[#000] flex justify-center flex-col items-center">
-        <input type="range" class="w-[80%] max ">
+    <footer class=" progress_bar h-[13vh] bg-[#000] flex justify-center flex-col items-center">
+        <input type="range" class="w-[80%] " min="0" max="100">
         <div class="controls flex justify-center space-x-2">
             <img src="SVG/rewind.svg" class="h-10 mt-2 cursor-pointer ">
-            <img src="SVG/play.svg" class="h-10 mt-2 cursor-pointer ">
+            <img src="SVG/play.svg" class=" play h-12 mt-[2px] cursor-pointer ">
             <img src="SVG/forward.svg" class="h-10 mt-2 cursor-pointer ">
         </div>
 
