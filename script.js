@@ -1,13 +1,17 @@
+document.addEventListener("DOMContentLoaded", function() {
+
 // Variables
 let audio_input = document.getElementsByClassName("file_chooser")[0];
 let music_playlist = document.querySelector(".music_playlist");
 let play_or_pause_button = document.getElementsByClassName("play")[0];
-let progress_bar = document.getElementsByClassName("progress_bar")[0];
-let audio; // Declare audio variable outside functions
+let progress_bar = document.querySelector(".progress_bar");
+
+
+let audio = new Audio(); // Initialize audio once
+console.log(audio);
 let resume_position = 0;
 
 // Functions
-
 function file_selection_handler(event) {
   let selected_file = event.target.files[0];
 
@@ -17,16 +21,15 @@ function file_selection_handler(event) {
     reader.onload = function (e) {
       let data = e.target.result;
 
-      audio = new Audio(); // Initialize audio once
-
       if (audio_input.files.length > 0) {
         let source_tag = document.createElement("source");
         let play_list_item = document.createElement("div");
-        play_list_item.style.aspectRatio = "1/1";
-        play_list_item.style.height = "30px";
-        play_list_item.style.backgroundColor = "#574e4e";
+
+        // play_list_item.style.aspectRatio = "1/1";
+        play_list_item.style.height = "52px";
+        play_list_item.style.backgroundColor = "#2c3e50";
         play_list_item.style.width = "90%";
-        play_list_item.style.marginLeft = "8px";
+        play_list_item.style.marginLeft = "40px";
         play_list_item.style.marginTop = "15px";
         play_list_item.style.borderRadius = "5px";
         play_list_item.style.cursor = "pointer";
@@ -51,11 +54,14 @@ function file_selection_handler(event) {
           audio.currentTime = 0;
         });
 
+      update_seekbar(selected_file)
+      updating_audio_with_seekbar(selected_file)
+
         play_or_pause_button.addEventListener("click", () => {
           if (audio.paused) {
             play_audio(data);
             play_or_pause_button.src = "SVG/pause.svg";
-            play_or_pause_button.style.height = "58px";
+            // play_or_pause_button.style.height = "58px";
           } else {
             pause_audio();
             play_or_pause_button.src = "SVG/play.svg";
@@ -70,18 +76,42 @@ function file_selection_handler(event) {
   }
 }
 
+function update_seekbar() {
+  audio.addEventListener("timeupdate", () => {
+    let progress = (audio.currentTime / audio.duration) * 100;
+    progress_bar.value = progress;
+  });
+}
+
+// function updating_audio_with_seekbar() {
+//   progress_bar.addEventListener("input", () => {
+//     let seekValue = progress_bar.value;
+//     let newTime = (seekValue / 100) * audio.duration;
+//     audio.currentTime = newTime;
+//   });
+// }
+
+function updating_audio_with_seekbar() {
+  progress_bar.addEventListener("input", () => {
+    audio.currentTime = Math.floor((progress_bar.value * audio.duration) / 100);
+  });
+}
+
+
 function play_audio(url) {
   audio.src = url; // Set the source
-  audio.currentTime = resume_position; 
+  audio.currentTime = resume_position;
   audio.play();
 }
 
 function pause_audio() {
-  resume_position = audio.currentTime; 
+  resume_position = audio.currentTime;
   audio.pause();
 }
 
 audio_input.addEventListener("change", file_selection_handler);
+})
 
 
-//implement progress bar
+// add local storage 
+// add rewind and forward functionality
