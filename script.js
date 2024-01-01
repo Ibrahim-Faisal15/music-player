@@ -1,117 +1,68 @@
-document.addEventListener("DOMContentLoaded", function() {
+//Creating Objects
+let audio_object = new Audio();
+let file_reader = new FileReader();
 
-// Variables
-let audio_input = document.getElementsByClassName("file_chooser")[0];
+//Global Variables
+let playlist = [];
+let audio_chooser = document.querySelector(".file_chooser");
+// let file_list = audio_chooser.files;
+let currrent_index = 0;
+
+// Creating Playlist Items
 let music_playlist = document.querySelector(".music_playlist");
-let play_or_pause_button = document.getElementsByClassName("play")[0];
-let progress_bar = document.querySelector(".progress_bar");
+let play_list_item = document.createElement("div");
+let audio_tag = document.createElement("audio");
+let source_tag = document.createElement("source");
+
+// Audio controls
+let rewind = document.querySelector(".rewind")
+let play = document.querySelector(".play")
+let forward = document.querySelector(".forward")
+
+//Seekbar
+let seek_bar = document.querySelector(".progress_bar");
 
 
-let audio = new Audio(); // Initialize audio once
-console.log(audio);
-let resume_position = 0;
+audio_chooser.addEventListener("change", () => {
+  for (let index = 0; index < audio_chooser.files.length; index++) {
+    let play_list_item = document.createElement("div");
+    let audioURL = URL.createObjectURL(audio_chooser.files[index]);
+    play_list_item.innerText = audio_chooser.files[index].name;
 
-// Functions
-function file_selection_handler(event) {
-  let selected_file = event.target.files[0];
+    // Play List Item Styling
+    play_list_item.style.height = "52px";
+    play_list_item.style.backgroundColor = "#2c3e50";
+    play_list_item.style.width = "90%";
+    play_list_item.style.marginLeft = "40px";
+    play_list_item.style.marginTop = "15px";
+    play_list_item.style.borderRadius = "5px";
+    play_list_item.style.cursor = "pointer";
+    play_list_item.style.display = "flex";
+    play_list_item.style.alignItems = "center";
 
-  if (selected_file) {
-    let reader = new FileReader();
+    play_list_item.addEventListener("click", () => {
+      audio_object.src = audioURL;
+      audio_object.play();
+       play.src = "SVG/pause.svg";
+    });
 
-    reader.onload = function (e) {
-      let data = e.target.result;
+    audio_object.addEventListener("change", ()=>{
+        progress = 0;
+        seek_bar.value = audio_object.currentTime*audio_object.duration/100
+    })
 
-      if (audio_input.files.length > 0) {
-        let source_tag = document.createElement("source");
-        let play_list_item = document.createElement("div");
-
-        // play_list_item.style.aspectRatio = "1/1";
-        play_list_item.style.height = "52px";
-        play_list_item.style.backgroundColor = "#2c3e50";
-        play_list_item.style.width = "90%";
-        play_list_item.style.marginLeft = "40px";
-        play_list_item.style.marginTop = "15px";
-        play_list_item.style.borderRadius = "5px";
-        play_list_item.style.cursor = "pointer";
-        play_list_item.style.display = "flex";
-        play_list_item.style.alignItems = "center";
-        play_list_item.innerText = selected_file.name;
-
-        source_tag.src = URL.createObjectURL(audio_input.files[0]);
-        source_tag.type = "audio/mp3";
-
-        audio.appendChild(source_tag);
-        audio.controls = true;
-        audio.style.width = "100%";
-        audio.style.border = "2px solid white";
-        audio.style.display = "none";
-
-        music_playlist.appendChild(audio);
-        music_playlist.appendChild(play_list_item);
-
-        play_list_item.addEventListener("click", () => {
-          play_audio(data);
-          audio.currentTime = 0;
-        });
-
-      update_seekbar(selected_file)
-      updating_audio_with_seekbar(selected_file)
-
-        play_or_pause_button.addEventListener("click", () => {
-          if (audio.paused) {
-            play_audio(data);
-            play_or_pause_button.src = "SVG/pause.svg";
-            // play_or_pause_button.style.height = "58px";
-          } else {
-            pause_audio();
-            play_or_pause_button.src = "SVG/play.svg";
-          }
-        });
+    play.addEventListener("click", () => {
+      if (audio_object.paused || audio_object <= 0) {
+        audio_object.play()
+        play.src = "SVG/pause.svg"
       } else {
-        console.log("No file selected.");
+        audio_object.pause();
+        play.src = "SVG/play.svg";
       }
-    };
+    });
 
-    let file_data = reader.readAsDataURL(selected_file);
+    music_playlist.appendChild(play_list_item);
   }
-}
+});
 
-function update_seekbar() {
-  audio.addEventListener("timeupdate", () => {
-    let progress = (audio.currentTime / audio.duration) * 100;
-    progress_bar.value = progress;
-  });
-}
-
-// function updating_audio_with_seekbar() {
-//   progress_bar.addEventListener("input", () => {
-//     let seekValue = progress_bar.value;
-//     let newTime = (seekValue / 100) * audio.duration;
-//     audio.currentTime = newTime;
-//   });
-// }
-
-function updating_audio_with_seekbar() {
-  progress_bar.addEventListener("input", () => {
-    audio.currentTime = Math.floor((progress_bar.value * audio.duration) / 100);
-  });
-}
-
-
-function play_audio(url) {
-  audio.src = url; // Set the source
-  audio.currentTime = resume_position;
-  audio.play();
-}
-
-function pause_audio() {
-  resume_position = audio.currentTime;
-  audio.pause();
-}
-
-audio_input.addEventListener("change", file_selection_handler);
-})
-
-
-// add local storage 
-// add rewind and forward functionality
+//add seekbar
