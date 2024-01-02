@@ -1,108 +1,130 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // Variables
-  let audio_input = document.getElementsByClassName("file_chooser")[0];
-  let music_playlist = document.querySelector(".music_playlist");
-  let forward_button = document.querySelector(".forward");
-  let rewind_button = document.querySelector(".rewind");
-  let play_or_pause_button = document.getElementsByClassName("play")[0];
-  let progress_bar = document.querySelector(".progress_bar");
-  let song_list = [];
-  let audio = new Audio();
-  let resume_position = 0;
+// Creating Objects
+let audio_object = new Audio();
+let file_reader = new FileReader();
 
-  // Functions
-  function file_selection_handler(event) {
-    let selected_file = event.target.files[0];
-    song_list.push(selected_file);
-    console.log(song_list);
+// Global Variables
+let playlist = [];
+let audio_chooser = document.querySelector(".file_chooser");
+let currrent_index = 0;
 
-    if (selected_file) {
-      let reader = new FileReader();
+// Creating Playlist Items
+let music_playlist = document.querySelector(".music_playlist");
+let play = document.querySelector(".play");
+let forward = document.querySelector(".forward");
+let rewind = document.querySelector(".rewind");
+let seek_bar = document.querySelector(".progress_bar");
 
-      reader.onload = function (e) {
-        let data = e.target.result;
-        let source_tag = document.createElement("source");
-        let play_list_item = document.createElement("div");
+// Load playlist from local storage on page load
+document.addEventListener("DOMContentLoaded", () => {
+  let storedPlaylist = localStorage.getItem("songs");
 
-        play_list_item.style.height = "52px";
-        play_list_item.style.backgroundColor = "#2c3e50";
-        play_list_item.style.width = "90%";
-        play_list_item.style.marginLeft = "40px";
-        play_list_item.style.marginTop = "15px";
-        play_list_item.style.borderRadius = "5px";
-        play_list_item.style.cursor = "pointer";
-        play_list_item.style.display = "flex";
-        play_list_item.style.alignItems = "center";
-        play_list_item.innerText = selected_file.name;
+  if (storedPlaylist !== null) {
+    playlist = JSON.parse(storedPlaylist);
 
-        source_tag.src = URL.createObjectURL(selected_file);
-        source_tag.type = "audio/mp3";
-
-        audio.appendChild(source_tag);
-        audio.controls = true;
-        audio.style.width = "100%";
-        audio.style.border = "2px solid white";
-        audio.style.display = "none";
-
-        music_playlist.appendChild(audio);
-        music_playlist.appendChild(play_list_item);
-
-        forward_button.addEventListener("click", () => {
-          play_audio(data);
-        });
-
-        play_list_item.addEventListener("click", () => {
-          play_audio(data);
-          audio.currentTime = 0;
-          play_or_pause_button.src = "SVG/pause.svg";
-        });
-
-        update_seekbar();
-        updating_audio_with_seekbar();
-
-        play_or_pause_button.addEventListener("click", () => {
-          if (audio.paused) {
-            play_audio(data);
-            play_or_pause_button.src = "SVG/pause.svg";
-          } else {
-            pause_audio();
-            play_or_pause_button.src = "SVG/play.svg";
-          }
-        });
-      };
-
-      reader.readAsDataURL(selected_file);
+    // Create playlist items for each stored item
+    for (let i = 0; i < playlist.length; i++) {
+      createPlaylistItem(playlist[i]);
     }
   }
-
-  function update_seekbar() {
-    audio.removeEventListener("timeupdate", updateSeekbarHandler);
-    audio.addEventListener("timeupdate", updateSeekbarHandler);
-  }
-
-  function updateSeekbarHandler() {
-    let progress = (audio.currentTime / audio.duration) * 100;
-    progress_bar.value = progress;
-  }
-
-  function updating_audio_with_seekbar() {
-    progress_bar.addEventListener("input", () => {
-      let seekValue = progress_bar.value;
-      let newTime = (seekValue / 100) * audio.duration;
-      audio.currentTime = newTime;
-    });
-  }
-
-  function play_audio(url) {
-    audio.src = url;
-    audio.currentTime = resume_position;
-    audio.play();
-  }
-
-  function pause_audio() {
-    resume_position = audio.currentTime;
-    audio.pause();
-  }
-
-  audio_input.addEventListener("change", file_selection_handler);
 });
+
+audio_chooser.addEventListener("change", () => {
+  for (let index = 0; index < audio_chooser.files.length; index++) {
+    let audioURL = URL.createObjectURL(audio_chooser.files[index]);
+
+    let play_list_data = {
+      name: audio_chooser.files[index].name,
+      url: audioURL,
+    };
+
+    // Update playlist and local storage
+    playlist.push(play_list_data);
+    localStorage.setItem("songs", JSON.stringify(playlist));
+
+    // Create and append playlist item
+    createPlaylistItem(play_list_data);
+  }
+});
+
+function createPlaylistItem(play_list_data) {
+  let play_list_item = document.createElement("div");
+  play_list_item.innerText = play_list_data.name;
+  play_list_item.style.height = "52px";
+  play_list_item.style.backgroundColor = "#2c3e50";
+  play_list_item.style.width = "90%";
+  play_list_item.style.marginTop = "15px";
+  play_list_item.style.marginTop = "15px";
+  play_list_item.style.marginLeft = "15px";
+  play_list_item.style.borderRadius = "5px";
+  play_list_item.style.cursor = "pointer";
+  play_list_item.style.display = "flex";
+  play_list_item.style.alignItems = "center";
+  play_list_item.style.color = "white";
+  play_list_item.style.paddingLeft = "23px";
+
+  play_list_item.addEventListener("click", () => {
+    audio_object.src = play_list_data.url;
+    audio_object.play();
+    play.src = "SVG/pause.svg";
+  });
+
+  audio_object.addEventListener("timeupdate", () => {
+    progress = (audio_object.currentTime / audio_object.duration) * 100;
+    seek_bar.value = progress;
+  });
+
+  seek_bar.addEventListener("input", () => {
+    if (!audio_object.paused) {
+      audio_object.currentTime = (seek_bar.value * audio_object.duration) / 100;
+    }
+  });
+
+  play.addEventListener("click", () => {
+    play.src = "SVG/play.svg";
+    if (audio_object.paused || audio_object.currentTime <= 0) {
+      audio_object.play();
+      play.src = "SVG/pause.svg";
+    } else {
+      audio_object.pause();
+      play.src = "SVG/play.svg";
+    }
+  });
+
+  forward.addEventListener("click", () => {
+    // Check if there are tracks in the playlist
+    if (playlist.length > 0) {
+      currrent_index++;
+
+      if (currrent_index < playlist.length) {
+        let nextAudioURL = URL.createObjectURL(playlist[currrent_index]);
+        audio_object.src = nextAudioURL;
+
+        // Play the next track
+        audio_object.play();
+        play.src = "SVG/pause.svg";
+      } else {
+        currrent_index = 0;
+      }
+    }
+  });
+
+  rewind.addEventListener("click", () => {
+    // Check if there are tracks in the playlist
+    if (playlist.length > 0) {
+      currrent_index--;
+
+      if (currrent_index >= 0) {
+        let prevAudioURL = URL.createObjectURL(playlist[currrent_index]);
+        audio_object.src = prevAudioURL;
+
+        // Play the previous track
+        audio_object.play();
+        play.src = "SVG/pause.svg";
+      } else {
+        currrent_index = playlist.length - 1;
+      }
+    }
+  });
+
+  music_playlist.appendChild(play_list_item);
+}
