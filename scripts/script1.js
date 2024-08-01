@@ -68,7 +68,7 @@ function createPlaylistItem(play_list_data) {
     play.src = "SVG/pause.svg";
   });
 
-  audio_object.addEventListener("timeupdate", () => {
+  audio_object.addEventListener("", () => {
     progress = (audio_object.currentTime / audio_object.duration) * 100;
     seek_bar.value = progress;
   });
