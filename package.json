@@ -109,7 +109,8 @@
     "yaml": "^2.3.4"
   },
   "scripts": {
-    "start": "vite"
+    "start": "vite",
+    "build": "vite build"
   },
   "keywords": [],
   "author": "",
