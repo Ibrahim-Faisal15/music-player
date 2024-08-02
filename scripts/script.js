@@ -12,16 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   audio_chooser.addEventListener("change", (e) => {
     let play_list_item = document.createElement("div");
-    Array.from(audio_chooser.files).forEach((file, index) => {
-      console.log("Try again");
+    Array.from(audio_chooser.files).forEach((file) => {
       playlist.push(file);
-      console.log(Array.from(audio_chooser.files));
-      console.log(playlist);
 
-      playlist.forEach((i, j) => {
+      playlist.forEach((i, index) => {
         let song_details = {
           songName: i.name.split(".")[0],
           songUrl: URL.createObjectURL(i),
+          song_index: index,
         };
         play_list_item.innerText = song_details.songName;
         play_list_item.style.height = "52px";
@@ -36,14 +34,15 @@ document.addEventListener("DOMContentLoaded", () => {
         play_list_item.style.alignItems = "center";
         play_list_item.style.color = "white";
         play_list_item.style.paddingLeft = "23px";
-        play_list_item.className = `song${j}`;
+        play_list_item.className = `song${index}`;
         play_list_item.setAttribute("data-song-URL", song_details.songUrl);
+        play_list_item.setAttribute("data-song-index", song_details.song_index);
         music_playlist.appendChild(play_list_item);
       });
 
       play_list_item.addEventListener("click", (e) => {
-        console.log(23);
         audioContext.src = e.target.getAttribute("data-song-URL");
+        let element_index = e.target.getAttribute("data-song-index");
         audioContext.play();
         play.src = "SVG/pause.svg";
         play.addEventListener("click", () => {
@@ -58,13 +57,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
         audioContext.addEventListener("timeupdate", () => {
           let song_progress =
-            (audioContext.currentTime * audioContext.duration) / 100;
-          seek_bar.value = song_progress;
+            (audioContext.currentTime / audioContext.duration) * 100;
+          if (song_progress === 100) {
+            seek_bar.value = 0;
+          } else {
+            seek_bar.value = song_progress;
+          }
         });
 
         seek_bar.addEventListener("input", (e) => {
           let current_value = e.target.value;
-          audioContext.currentTime = current_value;
+          audioContext.currentTime =
+            (current_value * audioContext.duration) / 100;
+          play.src = "SVG/play.svg";
+        });
+
+        forward.addEventListener("click", () => {
+          if (playlist.length <= 1) {
+            alert("Add a song.");
+          }
+
+          element_index++;
+
+          let next_song = document
+            .querySelector(`.song${element_index}`)
+            .getAttribute("data-song-URL");
+          audioContext.src = next_song;
+
+          audioContext.play();
+        });
+
+        rewind.addEventListener("click", () => {
+          if (playlist.length == 1 || element_index === 0) {
+            audioContext.currentTime = 0;
+          }
+
+          element_index--;
+
+          let next_song = document
+            .querySelector(`.song${element_index}`)
+            .getAttribute("data-song-URL");
+          audioContext.src = next_song;
+
+          audioContext.play();
         });
       });
     });
